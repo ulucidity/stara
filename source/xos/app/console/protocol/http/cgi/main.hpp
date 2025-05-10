@@ -16,7 +16,7 @@
 ///   File: main.hpp
 ///
 /// Author: $author$
-///   Date: 1/18/2025
+///   Date: 1/18/2025, 5/9/2025
 //////////////////////////////////////////////////////////////////////////
 #ifndef XOS_APP_CONSOLE_PROTOCOL_HTTP_CGI_MAIN_HPP
 #define XOS_APP_CONSOLE_PROTOCOL_HTTP_CGI_MAIN_HPP
@@ -1217,11 +1217,15 @@ protected:
         return content_type_;
     }
     virtual content_type_header_t* set_content_type(const char_t* chars) {
+        content_type_header_t* content_type = 0;
         if ((chars) && (chars[0])) {
-            if (!(get_content_type_of(chars))) {
-                if ((content_type_ = content_type_other())) {
+            if (!(content_type = get_content_type_of(chars))) {
+                if ((content_type = content_type_other())) {
                     content_type_->set_value(chars);
+                    set_content_type(content_type);
                 }
+            } else {
+                set_content_type(content_type);
             }
         }
         return content_type_;
@@ -1375,6 +1379,9 @@ protected:
     }
     virtual content_type_header_t* default_content_type() const {
         return this->content_type_text();
+    }
+    virtual content_type_header_t* redirect_content_type() const {
+        return this->content_type_html();
     }
     virtual content_type_header_t* content_type_text() const {
         return (content_type_header_t*)&content_type_text_;
