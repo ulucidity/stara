@@ -38,6 +38,8 @@
 #include "xos/io/crt/file/writer.hpp"
 #include "xos/io/string/reader.hpp"
 
+#define XOS_APP_CONSOLE_PROTOCOL_HTTP_CGI_REDIRECT_SECONDS "3"
+
 namespace xos {
 namespace app {
 namespace console {
@@ -85,7 +87,14 @@ public:
       environment_name_("environment"), environment_file_name_("cgicatch-env.txt"), environment_file_pattern_("environment\r\n"),
       input_name_("stdin"), input_file_name_("cgicatch-stdin.txt"), input_file_pattern_("stdin\r\n"),
       form_name_("form"), form_file_name_("cgicatch-form.txt"), form_file_pattern_("form\r\n"),
-      query_name_("query"), query_file_name_("cgicatch-query.txt"), query_file_pattern_("query\r\n") {
+      query_name_("query"), query_file_name_("cgicatch-query.txt"), query_file_pattern_("query\r\n"), 
+
+      action_form_field_name_("action"), host_form_field_name_("host"), port_form_field_name_("port"), redirect_form_field_name_("redirect"), 
+      before_redirect_content_
+      ("<html><head><meta http-equiv=\"refresh\" content=\"" \
+       XOS_APP_CONSOLE_PROTOCOL_HTTP_CGI_REDIRECT_SECONDS ";url="), 
+      between_redirect_content_("\"</meta></head><body>"), 
+      after_redirect_content_("</body></html>") {
     }
     virtual ~maint() {
     }
@@ -1644,6 +1653,60 @@ protected:
     //////////////////////////////////////////////////////////////////////////
 
     //////////////////////////////////////////////////////////////////////////
+    /// ...form_field_name...
+    virtual string_t& action_form_field_name() const {
+        return (string_t&) action_form_field_name_;
+    }
+    virtual string_t& host_form_field_name() const {
+        return (string_t&) host_form_field_name_;
+    }
+    virtual string_t& port_form_field_name() const {
+        return (string_t&) port_form_field_name_;
+    }
+    virtual string_t& redirect_form_field_name() const {
+        return (string_t&) redirect_form_field_name_;
+    }
+    //////////////////////////////////////////////////////////////////////////
+    /// ...form_field_value...
+    virtual string_t& action_form_field_value() const {
+        return (string_t&) action_form_field_value_;
+    }
+    virtual string_t& host_form_field_value() const {
+        return (string_t&) host_form_field_value_;
+    }
+    virtual string_t& port_form_field_value() const {
+        return (string_t&) port_form_field_value_;
+    }
+    //////////////////////////////////////////////////////////////////////////
+    virtual string_t& set_redirect_form_field_value(const string_t& to) {
+        string_t& redirect_form_field_value = this->redirect_form_field_value();
+        redirect_form_field_value.assign(to);
+        return redirect_form_field_value;
+    }
+    virtual const char_t* redirect_form_field_value_chars(size_t& length) const {
+        const string_t& redirect_form_field_value = this->redirect_form_field_value();
+        const char_t* chars = redirect_form_field_value.has_chars(length);
+        return chars;
+    }
+    virtual string_t& redirect_form_field_value() const {
+        return (string_t&) redirect_form_field_value_;
+    }
+    //////////////////////////////////////////////////////////////////////////
+    virtual string_t& before_redirect_content() const {
+        return (string_t&) before_redirect_content_;
+    }
+    virtual string_t& between_redirect_content() const {
+        return (string_t&) between_redirect_content_;
+    }
+    virtual string_t& after_redirect_content() const {
+        return (string_t&) after_redirect_content_;
+    }
+    virtual string_t& redirect_content() const {
+        return (string_t&) redirect_content_;
+    }
+    //////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////
 protected:
     content_type_header_t *out_content_type_, *content_type_,
                           content_type_text_, content_type_html_, content_type_xml_,
@@ -1656,6 +1719,10 @@ protected:
              input_name_, input_file_name_, input_file_pattern_,
              form_name_, form_file_name_, form_file_pattern_,
              query_name_, query_file_name_, query_file_pattern_;
+
+    string_t action_form_field_name_, host_form_field_name_, port_form_field_name_, redirect_form_field_name_,
+             action_form_field_value_, host_form_field_value_, port_form_field_value_, redirect_form_field_value_, 
+             before_redirect_content_, between_redirect_content_, after_redirect_content_, redirect_content_;
     
     gateway_interface_t gateway_interface_;
     configure_values_t configure_;
